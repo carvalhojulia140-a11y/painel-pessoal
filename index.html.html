@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Pessoal | Faculdade & Trabalho</title>
+<style>
+:root{
+ --bg:#f4f5f8;--panel:#fff;--ink:#202333;--muted:#74798b;--line:#e7e8ef;
+ --purple:#5141a5;--purple2:#7668c8;--dark:#25233b;--soft:#eeecfb;
+ --green:#19866b;--amber:#b7791f;--red:#c34d5b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}
+.sidebar{background:var(--dark);color:#fff;padding:24px 16px;display:flex;flex-direction:column;gap:24px}
+.brand{padding:4px 12px 18px;border-bottom:1px solid #45435a}
+.brand strong{font-size:18px;letter-spacing:.2px}.brand small{display:block;color:#b9b7cb;margin-top:6px}
+.nav{display:grid;gap:6px}
+.nav button{border:0;background:transparent;color:#d1cfdf;text-align:left;padding:12px 14px;border-radius:10px}
+.nav button.active,.nav button:hover{background:#454064;color:#fff}
+.sidebar-foot{margin-top:auto;color:#aaa8bd;font-size:12px;padding:10px 12px;line-height:1.6}
+main{padding:28px clamp(16px,3vw,38px);min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--purple);font-weight:700}
+h1{margin:5px 0;font-size:clamp(24px,3vw,32px);letter-spacing:-.7px}
+.subtitle{color:var(--muted);margin:6px 0 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 13px;border-radius:9px;font-weight:600}
+.btn.primary{background:var(--purple);border-color:var(--purple);color:white}
+.btn.subtle{background:var(--soft);border-color:transparent;color:var(--purple)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}
+.stat label{color:var(--muted);font-size:13px}.stat strong{display:block;font-size:28px;margin:10px 0 4px}.stat small{color:var(--muted)}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,1fr);gap:16px}
+.panel{margin-bottom:16px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.panel h2{font-size:16px;margin:0}.panel-head span{color:var(--muted);font-size:12px}
+.item{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--purple2);margin-top:6px;flex-shrink:0}
+.item-body{flex:1;min-width:0}.item-title{font-weight:650;overflow-wrap:anywhere}.item-meta{color:var(--muted);font-size:12px;margin-top:5px}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:var(--soft);color:var(--purple);font-size:11px;font-weight:700}
+.pill.green{background:#e5f5ef;color:var(--green)}.pill.amber{background:#fff3df;color:var(--amber)}.pill.red{background:#fdecef;color:var(--red)}
+.item-controls{display:flex;gap:5px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:white;border-radius:7px;padding:5px 8px;font-size:12px;color:var(--muted)}
+.empty{color:var(--muted);font-size:13px;padding:16px 0}
+.section{display:none}.section.active{display:block}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;min-width:150px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:650}
+.form input,.form select,.form textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:white;color:var(--ink)}
+.form textarea{min-height:80px;resize:vertical}
+.form .wide{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:8px;grid-column:1/-1;margin-top:4px}
+.modal{position:fixed;inset:0;background:#17162688;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal.open{display:flex}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:16px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:19px}.close{border:0;background:#f1f1f5;border-radius:8px;padding:8px}
+.flashcard{background:var(--dark);color:white;border-radius:15px;padding:24px;min-height:170px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;text-align:center}
+.flashcard .hint{color:#c4c0df;font-size:12px;margin-bottom:10px}.flashcard p{font-size:19px;line-height:1.5;margin:0}
+.flash-actions{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+footer{color:var(--muted);font-size:12px;text-align:center;margin:20px 0}
+@media(max-width:950px){.app{grid-template-columns:1fr}.sidebar{padding:14px;gap:12px}.brand{padding:6px 10px 12px}.nav{display:flex;overflow-x:auto}.nav button{white-space:nowrap}.sidebar-foot{display:none}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}}
+@media(max-width:520px){main{padding:18px 12px}.cards{gap:9px}.stat{padding:13px}.stat strong{font-size:23px}.form{grid-template-columns:1fr}.form .wide{grid-column:auto}.top{margin-bottom:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><strong>PAINEL PESSOAL</strong><small>Faculdade • Trabalho • Estudos</small></div>
+ <nav class="nav" aria-label="Navegação">
+  <button class="active" data-page="dashboard">▦ Visão geral</button>
+  <button data-page="academia">▤ Faculdade</button>
+  <button data-page="trabalho">▣ Trabalho</button>
+  <button data-page="estudos">✧ Central de estudos</button>
+  <button data-page="agenda">▦ Agenda & tarefas</button>
+ </nav>
+ <div class="sidebar-foot">Seus dados são salvos neste navegador.<br>Use Backup para exportar uma cópia.</div>
+</aside>
+<main>
+<header class="top">
+ <div><div class="eyebrow">Workspace pessoal</div><h1 id="page-title">Visão geral</h1><p class="subtitle" id="today"></p></div>
+ <div class="actions"><button class="btn" id="backup">Exportar backup</button><button class="btn" id="import-btn">Importar backup</button><input type="file" id="import-file" accept=".json,application/json" hidden><button class="btn primary" id="quick-add">＋ Nova tarefa</button></div>
+</header>
+
+<section class="section active" id="dashboard">
+ <div class="cards">
+  <div class="stat"><label>Provas próximas</label><strong id="stat-exams">0</strong><small>Próximos 30 dias</small></div>
+  <div class="stat"><label>Entregas pendentes</label><strong id="stat-assignments">0</strong><small>Trabalhos e atividades</small></div>
+  <div class="stat"><label>Tarefas abertas</label><strong id="stat-tasks">0</strong><small>Faculdade e trabalho</small></div>
+  <div class="stat"><label>Flashcards</label><strong id="stat-cards">0</strong><small>Na sua coleção</small></div>
+ </div>
+ <div class="content-grid">
+  <div class="panel"><div class="panel-head"><h2>Próximos compromissos</h2><span>Por data</span></div><div id="upcoming"></div></div>
+  <div><div class="panel"><div class="panel-head"><h2>Foco da semana</h2><span>Em aberto</span></div><div id="focus"></div><button class="btn subtle" onclick="navigate('agenda')">Ver todas as tarefas</button></div>
+  <div class="panel"><div class="panel-head"><h2>Atalhos</h2></div><div class="actions"><button class="btn subtle" onclick="openModal('exam')">＋ Prova</button><button class="btn subtle" onclick="openModal('assignment')">＋ Trabalho acadêmico</button><button class="btn subtle" onclick="openModal('task')">＋ Tarefa</button><button class="btn subtle" onclick="openModal('flashcard')">＋ Flashcard</button></div></div></div>
+ </div>
+</section>
+
+<section class="section" id="academia">
+ <div class="toolbar"><button class="btn primary" onclick="openModal('subject')">＋ Disciplina</button><button class="btn" onclick="openModal('exam')">＋ Prova</button><button class="btn" onclick="openModal('assignment')">＋ Trabalho / entrega</button><button class="btn" onclick="openModal('content')">＋ Conteúdo para estudar</button></div>
+ <div class="content-grid"><div class="panel"><div class="panel-head"><h2>Disciplinas</h2><span>Seu período</span></div><div id="subjects"></div></div><div class="panel"><div class="panel-head"><h2>Provas e entregas</h2></div><div id="academic-deadlines"></div></div></div>
+ <div class="panel"><div class="panel-head"><h2>Conteúdos para estudar</h2><span>Marque o progresso</span></div><div id="contents"></div></div>
+</section>
+
+<section class="section" id="trabalho">
+ <div class="toolbar"><button class="btn primary" onclick="openModal('work')">＋ Aula / atividade</button><button class="btn" onclick="openModal('task')">＋ Tarefa profissional</button></div>
+ <div class="content-grid"><div class="panel"><div class="panel-head"><h2>Aulas, lives e atividades</h2></div><div id="work-items"></div></div><div class="panel"><div class="panel-head"><h2>Afazeres do trabalho</h2></div><div id="work-tasks"></div></div></div>
+</section>
+
+<section class="section" id="estudos">
+ <div class="toolbar"><button class="btn primary" onclick="openModal('question')">＋ Questão</button><button class="btn" onclick="openModal('flashcard')">＋ Flashcard</button><button class="btn" onclick="openModal('content')">＋ Conteúdo</button></div>
+ <div class="content-grid"><div class="panel"><div class="panel-head"><h2>Banco de questões</h2><span id="question-count">0 questões</span></div><div id="questions"></div></div><div class="panel"><div class="panel-head"><h2>Flashcards</h2><span id="flashcard-count">0 cartões</span></div><div id="flashcards"></div><div class="flash-actions"><button class="btn" id="prev-card">← Anterior</button><button class="btn primary" id="flip-card">Virar cartão</button><button class="btn" id="next-card">Próximo →</button></div></div></div>
+</section>
+
+<section class="section" id="agenda">
+ <div class="toolbar"><button class="btn primary" onclick="openModal('task')">＋ Tarefa</button><select id="task-filter"><option value="all">Todas as tarefas</option><option value="open">Pendentes</option><option value="done">Concluídas</option><option value="college">Faculdade</option><option value="work">Trabalho</option></select></div>
+ <div class="panel"><div class="panel-head"><h2>Agenda de tarefas</h2><span>Ordenadas por prazo</span></div><div id="all-tasks"></div></div>
+</section>
+<footer>Protótipo inicial • Layout responsivo para computador e tablet</footer>
+</main>
+</div>
+
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><h2 id="modal-title">Adicionar</h2><button class="close" onclick="closeModal()">✕</button></div><form id="entry-form" class="form"></form></div></div>
+
+<script>
+const STORE='personal_panel_v1';
+let data={subjects:[],exams:[],assignments:[],contents:[],workItems:[],tasks:[],questions:[],flashcards:[]};
+let currentPage='dashboard',cardIndex=0,cardFlipped=false,formType='';
+const titles={dashboard:'Visão geral',academia:'Faculdade',trabalho:'Trabalho',estudos:'Central de estudos',agenda:'Agenda & tarefas'};
+const today=new Date();
+document.getElementById('today').textContent=today.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function load(){try{const s=localStorage.getItem(STORE);if(s)data=Object.assign(data,JSON.parse(s));}catch(e){console.warn(e)}}
+function save(){localStorage.setItem(STORE,JSON.stringify(data));render()}
+function navigate(page){currentPage=page;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===page));document.getElementById('page-title').textContent=titles[page];render()}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+function dateLabel(d){if(!d)return 'Sem data';return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})}
+function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function empty(msg='Nada cadastrado por aqui ainda.'){return `<div class="empty">${msg}</div>`}
+function pill(status){if(status==='Concluído'||status==='Estudado')return '<span class="pill green">'+status+'</span>';if(status==='Em andamento')return '<span class="pill amber">'+status+'</span>';if(status==='Atrasado')return '<span class="pill red">'+status+'</span>';return '<span class="pill">'+(status||'Pendente')+'</span>'}
+function row(item,kind,extra=''){let status=item.done?'Concluído':item.status||'Pendente';return `<div class="item"><div class="dot"></div><div class="item-body"><div class="item-title">${escapeHtml(item.title||item.name||'Sem título')}</div><div class="item-meta">${[item.subject,item.category,dateLabel(item.date),extra].filter(Boolean).map(escapeHtml).join(' · ')}</div><div style="margin-top:7px">${pill(status)}</div></div><div class="item-controls">${item.done?'<button class="mini" onclick="toggleDone(\''+kind+'\',\''+item.id+'\')">Reabrir</button>':'<button class="mini" onclick="toggleDone(\''+kind+'\',\''+item.id+'\')">Concluir</button>'}<button class="mini" onclick="removeItem(\''+kind+'\',\''+item.id+'\')">Excluir</button></div></div>`}
+function listItems(arr,kind,extra){return arr.length?arr.map(x=>row(x,kind,extra?extra(x):'')).join(''):empty()}
+function render(){
+ const now=new Date();const horizon=new Date(now);horizon.setDate(now.getDate()+30);
+ const upcomingExams=data.exams.filter(x=>!x.done&&x.date&&new Date(x.date+'T23:59:00')>=now&&new Date(x.date+'T00:00:00')<=horizon);
+ document.getElementById('stat-exams').textContent=upcomingExams.length;
+ document.getElementById('stat-assignments').textContent=data.assignments.filter(x=>!x.done).length;
+ document.getElementById('stat-tasks').textContent=data.tasks.filter(x=>!x.done).length;
+ document.getElementById('stat-cards').textContent=data.flashcards.length;
+ let events=[...data.exams.map(x=>({...x,kind:'exams',category:'Prova'})),...data.assignments.map(x=>({...x,kind:'assignments',category:'Entrega'})),...data.tasks.map(x=>({...x,kind:'tasks',category:x.area==='work'?'Trabalho':'Tarefa'})),...data.workItems.map(x=>({...x,kind:'workItems',category:'Aula / atividade'}))].filter(x=>!x.done&&x.date).sort((a,b)=>a.date.localeCompare(b.date));
+ document.getElementById('upcoming').innerHTML=listItems(events.slice(0,7),'events',x=>x.category);
+ const focus=data.tasks.filter(x=>!x.done).slice(0,5);document.getElementById('focus').innerHTML=listItems(focus,'tasks',x=>x.area==='work'?'Jota²':'Faculdade');
+ document.getElementById('subjects').innerHTML=listItems(data.subjects,'subjects',x=>x.teacher||'Disciplina');
+ document.getElementById('academic-deadlines').innerHTML=listItems([...data.exams,...data.assignments].sort((a,b)=>(a.date||'').localeCompare(b.date||'')),'academic');
+ document.getElementById('contents').innerHTML=listItems(data.contents,'contents',x=>x.subject+' · '+(x.status||'Pendente'));
+ document.getElementById('work-items').innerHTML=listItems(data.workItems,'workItems',x=>x.type||'Atividade');
+ document.getElementById('work-tasks').innerHTML=listItems(data.tasks.filter(x=>x.area==='work'),'tasks',x=>'Jota²');
+ document.getElementById('all-tasks').innerHTML=listItems(data.tasks.filter(x=>{let f=document.getElementById('task-filter').value;return f==='all'||(f==='open'&&!x.done)||(f==='done'&&x.done)||(f==='college'&&x.area==='college')||(f==='work'&&x.area==='work')} ).sort((a,b)=>(a.date||'').localeCompare(b.date||'')),'tasks',x=>x.area==='work'?'Jota²':'Faculdade');
+ document.getElementById('questions').innerHTML=data.questions.length?data.questions.map((q,i)=>`<div class="item"><div class="dot"></div><div class="item-body"><div class="item-title">${i+1}. ${escapeHtml(q.prompt)}</div><div class="item-meta">${escapeHtml(q.subject||'')}${q.topic?' · '+escapeHtml(q.topic):''}</div><details style="margin-top:8px"><summary style="cursor:pointer;color:var(--purple);font-size:13px">Ver resposta / resolução</summary><div style="padding:8px 0;font-size:13px">${escapeHtml(q.answer||'Resposta não cadastrada')}<br>${escapeHtml(q.explanation||'')}</div></details></div><button class="mini" onclick="removeItem('questions','${q.id}')">Excluir</button></div>`).join(''):empty();
+ document.getElementById('question-count').textContent=data.questions.length+' questões';
+ document.getElementById('flashcard-count').textContent=data.flashcards.length+' cartões';
+ renderCard();
+}
+function toggleDone(kind,id){let keys=kind==='events'?['exams','assignments','tasks','workItems']:kind==='academic'?['exams','assignments']:[kind];for(let k of keys){let x=data[k]?.find(y=>y.id===id);if(x){x.done=!x.done;x.status=x.done?'Concluído':'Pendente';break}}save()}
+function removeItem(kind,id){let keys=kind==='events'?['exams','assignments','tasks','workItems']:kind==='academic'?['exams','assignments']:[kind];for(let k of keys){if(data[k]){data[k]=data[k].filter(x=>x.id!==id)}}save()}
+function openModal(type){formType=type;const names={subject:'Nova disciplina',exam:'Cadastrar prova',assignment:'Trabalho ou entrega',content:'Conteúdo para estudar',work:'Aula ou atividade profissional',task:'Nova tarefa',question:'Adicionar questão',flashcard:'Adicionar flashcard'};document.getElementById('modal-title').textContent=names[type];document.getElementById('entry-form').innerHTML=formFor(type);document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function field(label,name,kind='text',wide=false,placeholder=''){return `<label class="${wide?'wide':''}">${label}<input name="${name}" type="${kind}" ${kind==='date'?'':''} placeholder="${placeholder}" ${['title','name','prompt'].includes(name)?'required':''}></label>`}
+function subjectSelect(){return `<label>Disciplina<select name="subject"><option value="">Selecione (opcional)</option>${data.subjects.map(s=>`<option>${escapeHtml(s.title)}</option>`).join('')}</select></label>`}
+function formFor(t){let f='';if(t==='subject')f=field('Nome da disciplina','title', 'text',true)+field('Professor(a)','teacher')+field('Período / módulo','module');
+ if(t==='exam')f=field('Nome da prova','title')+subjectSelect()+field('Data','date')+field('Conteúdo / observações','notes','text',true);
+ if(t==='assignment')f=field('Trabalho / entrega','title')+subjectSelect()+field('Prazo','date')+field('Descrição','notes','text',true);
+ if(t==='content')f=field('Assunto / objetivo de aprendizagem','title', 'text',true)+subjectSelect()+field('Status','statusSelect')+field('Data-alvo','date')+field('Notas','notes','text',true);
+ if(t==='work')f=field('Aula / atividade','title')+field('Tipo','type')+field('Data','date')+field('Detalhes','notes','text',true);
+ if(t==='task')f=field('Tarefa','title')+`<label>Área<select name="area"><option value="college">Faculdade</option><option value="work">Trabalho — Jota²</option><option value="personal">Pessoal</option></select></label>`+field('Prazo','date')+field('Detalhes','notes','text',true);
+ if(t==='question')f=field('Enunciado','prompt','text',true)+subjectSelect()+field('Tema','topic')+field('Resposta / alternativa correta','answer','text',true)+field('Resolução comentada','explanation','text',true);
+ if(t==='flashcard')f=field('Frente (pergunta)','front','text',true)+subjectSelect()+field('Verso (resposta)','back','text',true);
+ f=f.replace('type="statusSelect"','type="text"');if(t==='content'){f=f.replace('type="text" placeholder=""','type="text" placeholder="Pendente / Em andamento / Estudado"');}
+ return f+`<div class="form-actions"><button type="button" class="btn" onclick="closeModal()">Cancelar</button><button type="submit" class="btn primary">Salvar</button></div>`}
+document.getElementById('entry-form').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target),o=Object.fromEntries(fd.entries());o.id=crypto.randomUUID?crypto.randomUUID():String(Date.now());o.done=false;
+ const map={subject:'subjects',exam:'exams',assignment:'assignments',content:'contents',work:'workItems',task:'tasks',question:'questions',flashcard:'flashcards'};const key=map[formType];
+ if(formType==='subject')o.name=o.title;
+ if(formType==='content')o.status=o.status||'Pendente';
+ data[key].push(o);if(formType==='flashcard')cardIndex=data.flashcards.length-1;save();closeModal();});
+document.getElementById('quick-add').onclick=()=>openModal('task');
+document.getElementById('task-filter').addEventListener('change',render);
+document.getElementById('backup').onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-painel-pessoal.json';a.click();URL.revokeObjectURL(a.href)};
+document.getElementById('import-btn').onclick=()=>document.getElementById('import-file').click();
+document.getElementById('import-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const imported=JSON.parse(await file.text());if(!confirm('Importar este backup e substituir os dados atuais?'))return;data=imported;save();alert('Backup importado!')}catch(err){alert('Não foi possível importar: arquivo inválido.')}e.target.value=''};
+function renderCard(){const el=document.getElementById('flashcards');if(!data.flashcards.length){el.innerHTML=empty('Adicione flashcards para começar a revisar.');return}
+ const c=data.flashcards[(cardIndex+data.flashcards.length)%data.flashcards.length];el.innerHTML=`<div class="flashcard" id="card-face"><div class="hint">${cardFlipped?'RESPOSTA':'PERGUNTA'} • ${cardIndex+1}/${data.flashcards.length}</div><p>${escapeHtml(cardFlipped?c.back:c.front)}</p></div><div class="item-meta" style="text-align:center;margin-top:8px">${escapeHtml(c.subject||'')}</div>`;document.getElementById('card-face').onclick=()=>{cardFlipped=!cardFlipped;renderCard()}}
+document.getElementById('flip-card').onclick=()=>{cardFlipped=!cardFlipped;renderCard()};
+document.getElementById('prev-card').onclick=()=>{if(data.flashcards.length){cardIndex=(cardIndex-1+data.flashcards.length)%data.flashcards.length;cardFlipped=false;renderCard()}};
+document.getElementById('next-card').onclick=()=>{if(data.flashcards.length){cardIndex=(cardIndex+1)%data.flashcards.length;cardFlipped=false;renderCard()}};
+load();render();
+</script>
+</body>
+</html>
